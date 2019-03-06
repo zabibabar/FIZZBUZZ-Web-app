@@ -1,19 +1,18 @@
 'use strict';
 
-var fs = require('fs');
-var data = fs.readFileSync('users.json');
-const users = JSON.parse(data);
+let fs = require('fs');
+const users = JSON.parse(fs.readFileSync('users.json')); //Database file
 
-var express = require('express');
-var bodyParser = require('body-parser');
-var app = express();
+let express = require('express');
+let bodyParser = require('body-parser');
+let app = express();
 
 // Configure express settings
 app.set('trust proxy', true);
 app.use(bodyParser.urlencoded({limit: '10mb', extended: true}));
 app.use(bodyParser.json({limit: '10mb'}));
 
-
+//Avoid CORS error
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -22,7 +21,7 @@ app.use(function(req, res, next) {
 
 // routes
 app.get('/:id', function(req, res){
-   var id = req.params.id;
+   let id = req.params.id;
    console.log("GET request received at /" + id);
    res.type('application/json');
    if (users.hasOwnProperty(id)){
@@ -36,11 +35,11 @@ app.get('/:id', function(req, res){
 });
 
 app.post('/:id', function(req, res){
-   var id = req.params.id;
+   let id = req.params.id;
    console.log("POST request received at /" + id);
 
    res.type('application/json');
-   var score = Number(req.body.score);
+   let score = Number(req.body.score);
    
    //If user already exists
    if (users.hasOwnProperty(id)){
@@ -49,7 +48,7 @@ app.post('/:id', function(req, res){
          res.status(400).send({ Error: "Invalid score"});
 
       }
-      else {
+      else{ //Update the user
          users[id] = score;
          var data = JSON.stringify(users, null, 2);
          fs.writeFile('users.json', data, function(err){
@@ -64,7 +63,7 @@ app.post('/:id', function(req, res){
    else{
       //User Created, Status 201 
       users[id] = score;
-      var data = JSON.stringify(users, null, 2);
+      let data = JSON.stringify(users, null, 2);
       fs.writeFile('users.json', data, function(err){
          //Couldn't write, Status 500, content {Error: String}
          if (err) res.status(500).send({ Error: err});
