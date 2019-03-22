@@ -10,8 +10,7 @@ var app = express();
 
 // Configure express settings
 app.set("trust proxy", true);
-app.use(bodyParser.urlencoded({ limit: "10mb", extended: true }));
-app.use(bodyParser.json({ limit: "10mb" }));
+app.use(bodyParser.json());
 
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
@@ -32,7 +31,7 @@ app.get("/:id", function(req, res) {
     res.status(200).send({ id: id, score: users[id] });
   } else {
     //If user doesn't exist Status code = 404
-    res.status(404).send(null);
+    res.status(404).json(null);
   }
 });
 
@@ -43,7 +42,7 @@ app.post("/:id", function(req, res) {
   res.type("application/json");
   var score = Number(req.body.score);
 
-  if (!score || score < 0) {
+  if (isNaN(score) || score < 0) {
     // Invalid score, Status 400, content {Error: String}
     res.status(400).send({ Error: "Invalid score" });
   } else {
